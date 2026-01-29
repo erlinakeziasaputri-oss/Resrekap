@@ -754,7 +754,8 @@
             const [currentUser, setCurrentUser] = useState(null); 
             const [participantViewData, setParticipantViewData] = useState(null); 
 
-            const [users, setUsers] = useState([]);
+            // FIX: Initialize with default user immediately to prevent login lockout
+            const [users, setUsers] = useState([{ id: 'default_admin', username: 'Respati', password: '007' }]);
             const [tab, setTab] = useState('dashboard');
             const [events, setEvents] = useState([]);
             const [savedSheets, setSavedSheets] = useState([]);
@@ -790,12 +791,15 @@
 
                         // Listen to Users (stored as single doc for array compatibility)
                         const unsubUsers = onSnapshot(doc(db, basePath, "users_data"), (doc) => {
-                            const data = doc.exists() ? doc.data().list : [];
-                            if(data && data.length > 0) {
-                                setUsers(data);
+                            const data = doc.exists() ? doc.data() : null;
+                            
+                            // Check if valid data exists
+                            if(data && Array.isArray(data.list) && data.list.length > 0) {
+                                setUsers(data.list);
                             } else {
-                                // Fallback: Create default admin if DB is empty or missing
-                                const defaultUsers = [{ id: generateId(), username: 'Respati', password: '007' }];
+                                // Critical Fallback: If DB is empty/missing, FORCE default admin
+                                console.log("Database user kosong, reset ke default.");
+                                const defaultUsers = [{ id: 'default_admin', username: 'Respati', password: '007' }];
                                 setUsers(defaultUsers); 
                             }
                         });
