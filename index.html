@@ -25,7 +25,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCMrpygBZspSkjHR03xpBCiSKe59D63hyI",
@@ -47,6 +47,29 @@
         window.firebaseHelpers = { signInAnonymously, onAuthStateChanged, doc, setDoc, onSnapshot, collection };
         
         console.log("Firebase initialized successfully");
+
+        // --- FITUR TES KONEKSI (PERMINTAAN USER) ---
+        console.log("Firebase berhasil dimuat!"); 
+        console.log("Mencoba koneksi database...");
+
+        // Coba kirim data dummy (hanya untuk tes)
+        try {
+            const docRef = await addDoc(collection(db, "tes_koneksi"), {
+                pesan: "Halo Firebase, ini tes koneksi dari ResRekap",
+                waktu: new Date()
+            });
+            console.log("SUKSES! Terkoneksi. ID Data: ", docRef.id);
+            alert("Hore! Aplikasi berhasil terhubung ke Firebase!");
+        } catch (e) {
+            console.error("GAGAL Terkoneksi: ", e);
+            // Hanya alert jika permission denied yang fatal, agar tidak mengganggu jika offline
+            if (e.code === 'permission-denied') {
+                alert("GAGAL KONEKSI SERVER: Izin Ditolak.\n\nPastikan 'Firestore Rules' diatur ke 'allow read, write: if true;'.");
+            } else {
+                console.log("Info Tes Koneksi: Gagal mengirim data tes (mungkin offline atau belum login anonim). Cek console.");
+            }
+        }
+        // ------------------------------------------
     </script>
 
     <style>
