@@ -48,28 +48,18 @@
         
         console.log("Firebase initialized successfully");
 
-        // --- FITUR TES KONEKSI (PERMINTAAN USER) ---
-        console.log("Firebase berhasil dimuat!"); 
+        // --- FITUR TES KONEKSI (LOG ONLY - AGAR TIDAK MENGGANGGU) ---
+        // Saya ubah jadi console.log saja agar tidak muncul popup terus menerus jika sudah berhasil
         console.log("Mencoba koneksi database...");
-
-        // Coba kirim data dummy (hanya untuk tes)
         try {
             const docRef = await addDoc(collection(db, "tes_koneksi"), {
                 pesan: "Halo Firebase, ini tes koneksi dari ResRekap",
                 waktu: new Date()
             });
-            console.log("SUKSES! Terkoneksi. ID Data: ", docRef.id);
-            alert("Hore! Aplikasi berhasil terhubung ke Firebase!");
+            console.log("SUKSES TES KONEKSI! ID Data: ", docRef.id);
         } catch (e) {
-            console.error("GAGAL Terkoneksi: ", e);
-            // Hanya alert jika permission denied yang fatal, agar tidak mengganggu jika offline
-            if (e.code === 'permission-denied') {
-                alert("GAGAL KONEKSI SERVER: Izin Ditolak.\n\nPastikan 'Firestore Rules' diatur ke 'allow read, write: if true;'.");
-            } else {
-                console.log("Info Tes Koneksi: Gagal mengirim data tes (mungkin offline atau belum login anonim). Cek console.");
-            }
+            console.error("GAGAL TES KONEKSI: ", e);
         }
-        // ------------------------------------------
     </script>
 
     <style>
@@ -817,7 +807,8 @@
                         // 2. Real-time Listeners
                         // Updated appId namespace to match new project for consistency
                         const appId = "resrekap24_v1"; // Namespace for data
-                        const basePath = `artifacts/${appId}/public/data`;
+                        // CORRECTED PATH: Removed 'data' to ensure even number of segments for document path
+                        const basePath = `artifacts/${appId}/db`;
 
                         // Listen to Users (stored as single doc for array compatibility)
                         const unsubUsers = onSnapshot(doc(db, basePath, "users_data"), (doc) => {
@@ -878,7 +869,8 @@
                     const { doc, setDoc } = window.firebaseHelpers;
                     const db = window.db;
                     // Updated appId namespace here too
-                    const basePath = `artifacts/resrekap24_v1/public/data`;
+                    // CORRECTED PATH: Removed 'data' to ensure even number of segments for document path
+                    const basePath = `artifacts/resrekap24_v1/db`;
                     
                     try {
                         let payload = data;
