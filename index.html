@@ -1789,7 +1789,7 @@
                 }
             };
 
-            const TableHeaderConfig = ({ sectionId, title, onDownload }) => (
+            const TableHeaderConfig = ({ sectionId, title, onDownload, onDelete }) => (
                 <div className="px-6 py-4 bg-slate-900 text-white font-black flex flex-col md:flex-row items-center justify-between gap-4 uppercase tracking-widest text-[10px]">
                     <div className="flex items-center gap-3"><Icons.Trophy size={16} className="text-yellow-400"/> {title}</div>
                     <div className="flex items-center gap-4">
@@ -1802,6 +1802,11 @@
                                 onChange={e => updateWinnerCount(sectionId, e.target.value)}
                             />
                         </div>
+                        {onDelete && (
+                            <button onClick={onDelete} className="p-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all" title="Hapus Laporan">
+                                <Icons.Trash size={14}/>
+                            </button>
+                        )}
                         <button onClick={onDownload} className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all flex items-center gap-1.5"><Icons.Download size={12}/> PDF</button>
                     </div>
                 </div>
@@ -1950,6 +1955,12 @@
                                         sectionId={cr.id} 
                                         title={`${cr.name} (Gabungan)`} 
                                         onDownload={() => doDownload('custom', cr, cr.name)}
+                                        onDelete={() => {
+                                            modal("Hapus Laporan?", "confirm", () => {
+                                                const updatedReports = evt.custom_reports.filter(r => r.id !== cr.id);
+                                                updateEvt({...evt, custom_reports: updatedReports});
+                                            }, `Hapus laporan gabungan "${cr.name}"?`);
+                                        }}
                                     />
                                     {renderParticipantsTable(
                                         evt.participants,
