@@ -28,12 +28,12 @@
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyA90iL6mFRXP5rYJrMuqerdWI6NIUxX2X0",
-            authDomain: "resrekapp24.firebaseapp.com",
-            projectId: "resrekapp24",
-            storageBucket: "resrekapp24.firebasestorage.app",
-            messagingSenderId: "444767843808",
-            appId: "1:444767843808:web:dded775d0ff9b514f9a785"
+            apiKey: "AIzaSyCMrpygBZspSkjHR03xpBCiSKe59D63hyI",
+            authDomain: "resrekap24.firebaseapp.com",
+            projectId: "resrekap24",
+            storageBucket: "resrekap24.firebasestorage.app",
+            messagingSenderId: "464920670253",
+            appId: "1:464920670253:web:b783ced39ce42e9ca288a4"
         };
 
         // Initialize Firebase
@@ -392,11 +392,11 @@
 
         // --- COMPONENTS ---
 
-        const ModalWrapper = ({ children, isOpen, onClose }) => {
+        const ModalWrapper = ({ children, isOpen, onClose, maxWidth = "max-w-lg" }) => {
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 z-[100] modal-overlay overflow-y-auto grid place-items-center p-4" onClick={onClose}>
-                    <div className="relative bg-white w-full max-w-lg rounded-[24px] shadow-2xl animate-fade-in my-8 overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className={`relative bg-white w-full ${maxWidth} rounded-[24px] shadow-2xl animate-fade-in my-8 overflow-hidden`} onClick={e => e.stopPropagation()}>
                         {children}
                     </div>
                 </div>
@@ -792,7 +792,8 @@
                         setDbStatus('online');
 
                         // 2. Real-time Listeners
-                        const appId = "resrekapp24_v1"; // Namespace for data
+                        // Updated appId namespace to match new project for consistency
+                        const appId = "resrekap24_v1"; // Namespace for data
                         const basePath = `artifacts/${appId}/public/data`;
 
                         // Listen to Users (stored as single doc for array compatibility)
@@ -853,7 +854,8 @@
                 saveTimeoutRef.current[key] = setTimeout(async () => {
                     const { doc, setDoc } = window.firebaseHelpers;
                     const db = window.db;
-                    const basePath = `artifacts/resrekapp24_v1/public/data`;
+                    // Updated appId namespace here too
+                    const basePath = `artifacts/resrekap24_v1/public/data`;
                     
                     try {
                         let payload = data;
@@ -1215,7 +1217,7 @@
 
             return (
                 <div className="animate-fade-in">
-                    <ModalWrapper isOpen={!!editData} onClose={()=>setEditData(null)}>
+                    <ModalWrapper isOpen={!!editData} onClose={()=>setEditData(null)} maxWidth="max-w-3xl">
                         <div className="p-8">
                             <div className="flex justify-between items-center mb-8">
                                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">{editData?.id ? 'Ubah Informasi Event' : 'Registrasi Event Baru'}</h2>
@@ -1226,7 +1228,7 @@
                                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nama Perlombaan</label>
                                     <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium" placeholder="Nama event lomba..." value={editData?.name||''} onChange={e=>setEditData({...editData, name: e.target.value})}/>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Tanggal Pelaksanaan</label>
                                         <input type="date" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium" value={editData?.date||''} onChange={e=>setEditData({...editData, date: e.target.value})}/>
@@ -1238,7 +1240,7 @@
                                 </div>
                                 <div>
                                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Identitas Visual (Logo)</label>
-                                    <div className="flex gap-6 items-center bg-slate-50 p-6 rounded-3xl border border-slate-200">
+                                    <div className="flex flex-col md:flex-row gap-6 items-center bg-slate-50 p-6 rounded-3xl border border-slate-200">
                                         {editData?.logo ? (
                                             <div className="relative group">
                                                 <img src={editData.logo} className="w-16 h-16 object-contain border-2 border-white rounded-2xl bg-white shadow-sm"/>
@@ -1247,7 +1249,7 @@
                                         ) : (
                                             <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-300 border-2 border-dashed border-slate-200 shadow-inner"><Icons.Image size={20}/></div>
                                         )}
-                                        <div className="flex-1">
+                                        <div className="flex-1 w-full text-center md:text-left">
                                             <input type="file" id="event-logo-input" accept="image/*" className="hidden" onChange={handleLogo}/>
                                             <label htmlFor="event-logo-input" className="inline-flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm cursor-pointer">
                                                 {loading ? <Icons.Loader className="animate-spin" size={14}/> : <Icons.Upload size={14}/>} Unggah Logo
