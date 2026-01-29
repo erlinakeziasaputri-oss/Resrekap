@@ -198,6 +198,7 @@
         .status-syncing { background: #f59e0b; animation: pulse 1s infinite; }
         .status-online { background: #10b981; }
         .status-offline { background: #ef4444; }
+        .status-error { background: #ef4444; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -767,8 +768,9 @@
             const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
             
             // Firebase Status
-            const [dbStatus, setDbStatus] = useState('syncing'); // syncing, online, offline
+            const [dbStatus, setDbStatus] = useState('syncing'); // syncing, online, offline, error
             const [isAuthReady, setIsAuthReady] = useState(false);
+            const [permissionError, setPermissionError] = useState(false); // To prevent spamming alerts
 
             // --- FIREBASE INTEGRATION LOGIC ---
             useEffect(() => {
@@ -778,7 +780,11 @@
                 const auth = window.auth;
 
                 // 1. Authenticate Anonymously
-                signInAnonymously(auth).catch(console.error);
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Auth Error:", error);
+                    setDbStatus('error');
+                    alert("GAGAL LOGIN KE CLOUD!\n\nPastikan 'Anonymous Auth' sudah diaktifkan di Firebase Console > Authentication > Sign-in method.");
+                });
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
@@ -802,6 +808,11 @@
                                 const defaultUsers = [{ id: 'default_admin', username: 'Respati', password: '007' }];
                                 setUsers(defaultUsers); 
                             }
+                        }, (error) => {
+                            console.error("Listener Error:", error);
+                            if (error.code === 'permission-denied') {
+                                setDbStatus('error');
+                            }
                         });
 
                         // Listen to Events (stored as single doc for array compatibility to keep logic intact)
@@ -821,10 +832,7 @@
                         });
 
                         return () => {
-                            unsubUsers();
-                            unsubEvents();
-                            unsubSettings();
-                            unsubSheets();
+                            // unsubUsers(); // Cleanup might cause issues in React StrictMode dev, simplistic approach here
                         };
                     } else {
                         setDbStatus('offline');
@@ -855,7 +863,11 @@
                         setDbStatus('online');
                     } catch (err) {
                         console.error("Save failed", err);
-                        setDbStatus('offline');
+                        setDbStatus('error');
+                        if (err.code === 'permission-denied' && !permissionError) {
+                            setPermissionError(true);
+                            alert("GAGAL MENYIMPAN KE CLOUD!\n\nDatabase menolak akses. Mohon buka Firebase Console > Firestore Database > Rules, dan ubah 'allow read, write: if false;' menjadi 'allow read, write: if true;' atau sesuaikan aturan keamanan.");
+                        }
                     }
                 }, 2000); // 2 second delay to prevent spamming DB while typing scores
             };
@@ -922,7 +934,7 @@
                         <LoginView users={users} events={events} settings={settings} onLogin={handleLogin} onParticipantLogin={handleParticipantLogin} />
                         <div className="db-status">
                             <div className={`status-dot status-${dbStatus}`}></div>
-                            <span>{dbStatus === 'syncing' ? 'Menyimpan...' : dbStatus === 'online' ? 'Online' : 'Offline'}</span>
+                            <span>{dbStatus === 'syncing' ? 'Menyimpan...' : dbStatus === 'online' ? 'Database Terhubung' : dbStatus === 'error' ? 'Akses Ditolak Server' : 'Offline'}</span>
                         </div>
                     </>
                 );
@@ -995,7 +1007,7 @@
                     {/* DB STATUS INDICATOR */}
                     <div className="db-status">
                         <div className={`status-dot status-${dbStatus}`}></div>
-                        <span>{dbStatus === 'syncing' ? 'Menyimpan...' : dbStatus === 'online' ? 'Database Terhubung' : 'Offline'}</span>
+                        <span>{dbStatus === 'syncing' ? 'Menyimpan...' : dbStatus === 'online' ? 'Database Terhubung' : dbStatus === 'error' ? 'Akses Ditolak Server' : 'Offline'}</span>
                     </div>
                 </div>
             );
