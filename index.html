@@ -790,11 +790,13 @@
 
                         // Listen to Users (stored as single doc for array compatibility)
                         const unsubUsers = onSnapshot(doc(db, basePath, "users_data"), (doc) => {
-                            if(doc.exists()) {
-                                setUsers(doc.data().list || []);
+                            const data = doc.exists() ? doc.data().list : [];
+                            if(data && data.length > 0) {
+                                setUsers(data);
                             } else {
+                                // Fallback: Create default admin if DB is empty or missing
                                 const defaultUsers = [{ id: generateId(), username: 'Respati', password: '007' }];
-                                setUsers(defaultUsers); // Local fallback/init
+                                setUsers(defaultUsers); 
                             }
                         });
 
