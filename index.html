@@ -8,7 +8,9 @@
     <!-- 0. PENANGAN ERROR DARURAT -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
+            // Abaikan error umum yang tidak fatal
             if(message.includes("ResizeObserver")) return;
+            
             document.body.innerHTML = `
                 <div style="padding: 20px; font-family: sans-serif; color: #333; text-align: center; margin-top: 50px;">
                     <h2 style="color: #ef4444;">Terjadi Kesalahan Sistem</h2>
@@ -44,7 +46,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCMrpygBZspSkjHR03xpBCiSKe59D63hyI",
@@ -67,21 +69,8 @@
             window.firebaseHelpers = { signInAnonymously, onAuthStateChanged, doc, setDoc, onSnapshot, collection };
             
             console.log("Firebase initialized successfully");
-
-            // --- FITUR TES KONEKSI (DIBUNGKUS ASYNC AGAR TIDAK ERROR/BLANK) ---
-            (async () => {
-                console.log("Mencoba koneksi database...");
-                try {
-                    // Gunakan try-catch senyap agar tidak mengganggu UI utama
-                    const docRef = await addDoc(collection(db, "tes_koneksi"), {
-                        pesan: "Halo Firebase, ini tes koneksi dari ResRekap",
-                        waktu: new Date()
-                    });
-                    console.log("SUKSES TES KONEKSI! ID Data: ", docRef.id);
-                } catch (e) {
-                    console.warn("Info: Tes koneksi background gagal (tidak fatal):", e.message);
-                }
-            })();
+            // Kode tes koneksi dihapus untuk mencegah error blocking pada baris 79
+            
         } catch (err) {
             console.error("Firebase Init Error:", err);
         }
